@@ -1,0 +1,21 @@
+name: Go Release
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+permissions: read-all
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: actions-go-release
+      uses: RomanosTrechlis/actions-go-release@v1.0
+      with:
+        # Release's name
+        release_name: shoelaces
+        # Go's target operating system
+        goos: linux
+        # Go's target architecture
+        goarch: amd64
