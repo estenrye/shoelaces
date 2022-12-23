@@ -5,5 +5,4 @@ archives:
         info:
           owner: root
           group: root
-          mtime: '{{ .CommitDate }}'
           mode: 0644
