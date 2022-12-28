@@ -35,6 +35,7 @@ import (
 func PollHandler(w http.ResponseWriter, r *http.Request) {
 	env := envFromRequest(r)
 
+	env.Logger.Info("component", "polling", "function", "PollHandler", "remoteAddr", r.RemoteAddr, "x-forwarded-for", r.Header.Get("X-Forwarded-For"))
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -50,6 +51,8 @@ func PollHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+	} else {
+		env.Logger.Info("component", "polling", "function", "PollHandler", "x-forwarded-for", "is null")
 	}
 
 	vars := mux.Vars(r)
@@ -98,6 +101,7 @@ func ServerListHandler(w http.ResponseWriter, r *http.Request) {
 // booting manually.
 func UpdateTargetHandler(w http.ResponseWriter, r *http.Request) {
 	env := envFromRequest(r)
+	env.Logger.Info("component", "polling", "function", "UpdateTargetHandler", "remoteAddr", r.RemoteAddr, "x-forwarded-for", r.Header.Get("X-Forwarded-For"))
 
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
@@ -114,6 +118,8 @@ func UpdateTargetHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+	} else {
+		env.Logger.Info("component", "polling", "function", "PollHandler", "x-forwarded-for", "is null")
 	}
 
 	if err := r.ParseForm(); err != nil {
