@@ -16,9 +16,10 @@ package handlers
 
 import (
 	"context"
-	"github.com/justinas/alice"
 	"net/http"
 	"regexp"
+
+	"github.com/justinas/alice"
 
 	"github.com/thousandeyes/shoelaces/internal/environment"
 )
@@ -55,7 +56,7 @@ func loggingMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger := envFromRequest(r).Logger
 
-		logger.Info("component", "http", "type", "request", "src", r.RemoteAddr, "method", r.Method, "url", r.URL)
+		logger.Info("component", "http", "type", "request", "src", r.RemoteAddr, "x-forwarded-for", r.Header.Get("X-Forwarded-For"), "method", r.Method, "url", r.URL)
 		h.ServeHTTP(w, r)
 	})
 }

@@ -40,6 +40,17 @@ func PollHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	x_forwrded_for := r.Header.Get("X-Forwarded-For")
+	if x_forwrded_for != "" {
+		ips := strings.Split(x_forwrded_for, ", ")
+		if len(ips) >= 1 {
+			ip, _, err = net.SplitHostPort(ips[0])
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+	}
 
 	vars := mux.Vars(r)
 	// iPXE MAC addresses come with dashes instead of colons
