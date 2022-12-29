@@ -202,6 +202,7 @@ func (s *ShoelacesTemplates) RenderTemplate(logger log.Logger, configName string
 		return "", err
 	}
 	r := b.String()
+	logger.Info("component", "template", "r", r)
 	if strings.Contains(r, "<no value>") {
 		missingVariables := ""
 		for _, requiredVariable := range requiredVariables {
@@ -211,7 +212,7 @@ func (s *ShoelacesTemplates) RenderTemplate(logger log.Logger, configName string
 				}
 				missingVariables += requiredVariable
 			} else {
-				logger.Info("component", "template", "msg", "Missing variable in request", "variable", requiredVariable)
+				logger.Info("component", "template", "msg", "Found variable in paramMap", "variable", requiredVariable)
 			}
 		}
 		logger.Info("component", "template", "msg", "Missing variables in request", "variables", missingVariables)
