@@ -210,6 +210,8 @@ func (s *ShoelacesTemplates) RenderTemplate(logger log.Logger, configName string
 					missingVariables += ", "
 				}
 				missingVariables += requiredVariable
+			} else {
+				logger.Info("component", "template", "msg", "Missing variable in request", "variable", requiredVariable)
 			}
 		}
 		logger.Info("component", "template", "msg", "Missing variables in request", "variables", missingVariables)
