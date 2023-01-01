@@ -19,6 +19,7 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
+	"strings"
 
 	"github.com/thousandeyes/shoelaces/internal/utils"
 )
@@ -39,6 +40,17 @@ func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for key, val := range r.URL.Query() {
 		variablesMap[key] = val[0]
+		key_splits := strings.Split(key, ".")
+		if len(key_splits) > 1 {
+			map_pointer := variablesMap
+			for i, k := range key_splits {
+				if i < len(key_splits)-1 {
+					map_pointer[k] = make(map[string]interface{})
+				} else {
+					map_pointer[k] = val[0]
+				}
+			}
+		}
 	}
 
 	env := envFromRequest(r)
