@@ -49,13 +49,14 @@ func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			map_pointer := variablesMap
 			for i, k := range key_splits {
 				if i < len(key_splits)-1 {
-					map_pointer[k] = make(map[string]interface{})
+					map_pointer[k] = map[string]interface{}{}
 				} else {
 					map_pointer[k] = val[0]
 				}
 			}
 		}
-		env.Logger.Info("Map", variablesMap)
+		s, _ := json.Marshal(variablesMap)
+		env.Logger.Info("Map", s)
 	}
 
 	variablesMap["baseURL"] = utils.BaseURLforEnvName(env.BaseURL, envName)
