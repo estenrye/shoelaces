@@ -38,7 +38,7 @@ func TestDefaultEnvironment(t *testing.T) {
 }
 
 func TestInitScript(t *testing.T) {
-	params := make(map[string]string)
+	params := make(map[string]interface{})
 	params["one"] = "one_value"
 	configScript := mappings.YamlScript{Name: "testscript", Params: params}
 	mappingScript := initScript(configScript)
