@@ -50,11 +50,19 @@ func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			for i, k := range key_splits {
 				if i == 1 {
-					variablesMap[k] = map_pointer
+					if !utils.KeyInMap(k, variablesMap) {
+						variablesMap[k] = map_pointer
+					} else {
+						map_pointer = variablesMap[k].(map[string]interface{})
+					}
 				} else if i < len(key_splits)-1 {
-					temp := map[string]interface{}{}
-					map_pointer[k] = temp
-					map_pointer = temp
+					if !utils.KeyInMap(k, map_pointer) {
+						temp := map[string]interface{}{}
+						map_pointer[k] = temp
+						map_pointer = temp
+					} else {
+						map_pointer = map_pointer[k].(map[string]interface{})
+					}
 				} else {
 					map_pointer[k] = val[0]
 				}
