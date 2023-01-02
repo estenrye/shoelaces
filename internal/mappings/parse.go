@@ -50,7 +50,7 @@ type YamlHostnameMap struct {
 type YamlScript struct {
 	Name        string
 	Environment string
-	Params      map[string]string
+	Params      map[string]interface{}
 }
 
 // ParseYamlMappings parses the mappings yaml file into a Mappings struct.
