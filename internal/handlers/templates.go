@@ -42,7 +42,7 @@ func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	envName := envNameFromRequest(r)
 
 	for key, val := range r.URL.Query() {
-		env.Logger.Info("URL_Query_Variable", key, "Value", val[0])
+		env.Logger.Debug("URL_Query_Variable", key, "Value", val[0])
 		variablesMap[key] = val[0]
 		key_splits := strings.Split(key, ".")
 		if len(key_splits) > 1 {
@@ -69,7 +69,7 @@ func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		s, _ := json.Marshal(variablesMap)
-		env.Logger.Info("Map", s)
+		env.Logger.Debug("Map", s)
 	}
 
 	variablesMap["baseURL"] = utils.BaseURLforEnvName(env.BaseURL, envName)
