@@ -49,7 +49,7 @@ func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			map_pointer := map[string]interface{}{}
 
 			for i, k := range key_splits {
-				if i == 1 {
+				if i == 0 {
 					if !utils.KeyInMap(k, variablesMap) {
 						variablesMap[k] = map_pointer
 					} else {
