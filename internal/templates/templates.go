@@ -188,7 +188,7 @@ func (s *ShoelacesTemplates) RenderTemplate(logger log.Logger, configName string
 	logger.Info("component", "template", "action", "template-request", "template", configName, "env", envName, "parameters", utils.MapToString(paramMap))
 
 	requiredVariables := s.envTemplates[envName].templateVars[configName]
-
+	logger.Info("component", "template", "action", "template-request", "template", configName, "requiredVariables", requiredVariables)
 	var b bytes.Buffer
 	err := s.envTemplates[envName].templateObj.ExecuteTemplate(&b, configName, paramMap)
 	// Fall back to default template in case this is non default environment
@@ -206,7 +206,7 @@ func (s *ShoelacesTemplates) RenderTemplate(logger log.Logger, configName string
 	if strings.Contains(r, "<no value>") {
 		missingVariables := ""
 		for _, requiredVariable := range requiredVariables {
-			if !utils.KeyInMap(requiredVariable, paramMap) {
+			if !utils.KeyInMap(requiredVariable, paramMap, logger) {
 				if len(missingVariables) > 0 {
 					missingVariables += ", "
 				}

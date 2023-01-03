@@ -19,6 +19,8 @@ import (
 	"net"
 	"path/filepath"
 	"strings"
+
+	"github.com/thousandeyes/shoelaces/internal/log"
 )
 
 // Filter receives a slide of strings and a function that receives a string
@@ -47,8 +49,40 @@ func StringInSlice(a string, list []string) bool {
 }
 
 // KeyInMap checks wheter the received key exists in the received map.
-func KeyInMap(key string, mapInput map[string]interface{}) bool {
+func KeyInMap(key string, mapInput map[string]interface{}, logger log.Logger) bool {
+	logger.Debug("component", "utils", "function", "KeyInMap", "key", key)
 	_, found := mapInput[key]
+	key_splits := strings.Split(key, ".")
+	logger.Debug("component", "utils", "function", "KeyInMap", "key", key, "found", found, "nested_key", (len(key_splits) > 1))
+	if !found && len(key_splits) > 1 {
+		temp_var, found := mapInput[key_splits[0]].(map[interface{}]interface{})
+		logger.Debug("component", "utils", "function", "KeyInMap", "key", key, "found", found, "nested_key", (len(key_splits) > 1), "k", key_splits[0], "i", 0, "length", len(key_splits))
+		if found {
+			for i, k := range key_splits[1:] {
+				if i < len(key_splits)-2 {
+					temp_var, found = temp_var[k].(map[interface{}]interface{})
+					var iface interface{} = temp_var
+					logger.Debug("component", "utils", "function", "KeyInMap", "key", key, "found", found, "nested_key", (len(key_splits) > 1), "k", k, "i", i+1, "temp_var", iface)
+					if found {
+						continue
+					}
+					break
+				} else {
+					for sub_key, value := range temp_var {
+						if sub_key == k {
+							found = true
+						} else {
+							found = false
+						}
+						logger.Debug("component", "utils", "function", "KeyInMap", "key", key, "found", found, "nested_key", (len(key_splits) > 1), "k", k, "i", i+1, "key", sub_key.(string), "value", value.(string))
+						if found {
+							return true
+						}
+					}
+				}
+			}
+		}
+	}
 	return found
 }
 

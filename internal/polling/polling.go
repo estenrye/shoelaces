@@ -230,6 +230,7 @@ func genBootScript(logger log.Logger, templateRenderer *templates.ShoelacesTempl
 	script.Params["baseURL"] = utils.BaseURLforEnvName(baseURL, script.Environment)
 	text, err := templateRenderer.RenderTemplate(logger, script.Name, script.Params, script.Environment)
 	if err != nil {
+		logger.Info("component", "polling", "function", "genBootScript", err)
 		panic(err)
 	}
 	return text

@@ -79,6 +79,8 @@ func PollHandler(w http.ResponseWriter, r *http.Request) {
 func ServerListHandler(w http.ResponseWriter, r *http.Request) {
 	env := envFromRequest(r)
 
+	env.Logger.Debug("component", "handler", "ListServers", polling.ListServers(env.ServerStates))
+
 	servers, err := json.Marshal(polling.ListServers(env.ServerStates))
 	if err != nil {
 		env.Logger.Error("component", "handler", "err", err)
