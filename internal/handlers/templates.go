@@ -19,7 +19,6 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
-	"strings"
 
 	"github.com/thousandeyes/shoelaces/internal/utils"
 )
@@ -30,7 +29,6 @@ type TemplateHandler struct{}
 // TemplateHandler is the dynamic configuration provider endpoint. It
 // receives a key and maybe an environment.
 func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	variablesMap := map[string]interface{}{}
 	configName := filepath.Clean(r.URL.Path)
 
 	if configName == "" {
@@ -41,36 +39,8 @@ func (t *TemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	env := envFromRequest(r)
 	envName := envNameFromRequest(r)
 
-	for key, val := range r.URL.Query() {
-		env.Logger.Debug("URL_Query_Variable", key, "Value", val[0])
-		variablesMap[key] = val[0]
-		key_splits := strings.Split(key, ".")
-		if len(key_splits) > 1 {
-			map_pointer := map[string]interface{}{}
-
-			for i, k := range key_splits {
-				if i == 0 {
-					if !utils.KeyInMap(k, variablesMap, env.Logger) {
-						variablesMap[k] = map_pointer
-					} else {
-						map_pointer = variablesMap[k].(map[string]interface{})
-					}
-				} else if i < len(key_splits)-1 {
-					if !utils.KeyInMap(k, map_pointer, env.Logger) {
-						temp := map[string]interface{}{}
-						map_pointer[k] = temp
-						map_pointer = temp
-					} else {
-						map_pointer = map_pointer[k].(map[string]interface{})
-					}
-				} else {
-					map_pointer[k] = val[0]
-				}
-			}
-		}
-		s, _ := json.Marshal(variablesMap)
-		env.Logger.Debug("Map", s)
-	}
+	env.Logger.Debug("component", "TemplateHandler", "method", "ServeHTTP", "envName", envName)
+	variablesMap := varMapFromRequest(r)
 
 	variablesMap["baseURL"] = utils.BaseURLforEnvName(env.BaseURL, envName)
 

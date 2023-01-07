@@ -15,12 +15,17 @@
 package handlers
 
 import (
+	"encoding/json"
 	"html/template"
+	"net"
 	"net/http"
+	"strings"
+
+	"github.com/thousandeyes/shoelaces/internal/mappings"
 
 	"github.com/thousandeyes/shoelaces/internal/environment"
 	"github.com/thousandeyes/shoelaces/internal/ipxe"
-	"github.com/thousandeyes/shoelaces/internal/mappings"
+	"github.com/thousandeyes/shoelaces/internal/utils"
 )
 
 // DefaultTemplateRenderer holds information for rendering a template based
@@ -72,4 +77,74 @@ func envNameFromRequest(r *http.Request) string {
 		return e.(string)
 	}
 	return ""
+}
+
+func varMapFromRequest(r *http.Request) map[string]interface{} {
+	variablesMap := map[string]interface{}{}
+
+	env := r.Context().Value(ShoelacesEnvCtxID).(*environment.Environment)
+
+	for key, val := range r.URL.Query() {
+		env.Logger.Debug("URL_Query_Variable", key, "Value", val[0])
+		variablesMap[key] = val[0]
+		key_splits := strings.Split(key, ".")
+		if len(key_splits) > 1 {
+			map_pointer := map[string]interface{}{}
+
+			for i, k := range key_splits {
+				if i == 0 {
+					if !utils.KeyInMap(k, variablesMap, env.Logger) {
+						variablesMap[k] = map_pointer
+					} else {
+						map_pointer = variablesMap[k].(map[string]interface{})
+					}
+				} else if i < len(key_splits)-1 {
+					if !utils.KeyInMap(k, map_pointer, env.Logger) {
+						temp := map[string]interface{}{}
+						map_pointer[k] = temp
+						map_pointer = temp
+					} else {
+						map_pointer = map_pointer[k].(map[string]interface{})
+					}
+				} else {
+					map_pointer[k] = val[0]
+				}
+			}
+		}
+	}
+
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		s, _ := json.Marshal(variablesMap)
+		env.Logger.Debug("Map", s)
+		return variablesMap
+	}
+
+	x_forwrded_for := r.Header.Get("X-Forwarded-For")
+	if x_forwrded_for != "" {
+		ips := strings.Split(x_forwrded_for, ", ")
+		if len(ips) >= 1 {
+			ip = ips[0]
+		}
+	}
+
+	host := r.FormValue("host")
+	if host == "" {
+		host = resolveHostname(env.Logger, ip)
+	}
+
+	// Find with reverse hostname matched with the hostname regexps
+	if script, found := mappings.FindScriptForHostname(env.HostnameMaps, host); found {
+		for k, v := range script.Params {
+			variablesMap[k] = v
+		}
+	} else if script, found := mappings.FindScriptForNetwork(env.NetworkMaps, ip); found {
+		for k, v := range script.Params {
+			variablesMap[k] = v
+		}
+	}
+
+	s, _ := json.Marshal(variablesMap)
+	env.Logger.Debug("Map", s)
+	return variablesMap
 }
