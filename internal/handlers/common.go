@@ -128,10 +128,14 @@ func varMapFromRequest(r *http.Request) map[string]interface{} {
 		}
 	}
 
+	variablesMap["ip_address"] = ip
+
 	host := r.FormValue("host")
 	if host == "" {
 		host = resolveHostname(env.Logger, ip)
 	}
+
+	variablesMap["hostname"] = host
 
 	// Find with reverse hostname matched with the hostname regexps
 	if script, found := mappings.FindScriptForHostname(env.HostnameMaps, host); found {
