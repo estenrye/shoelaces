@@ -143,7 +143,7 @@ func attemptAutomaticBoot(logger log.Logger, hostnameMaps []mappings.HostnameMap
 	if script, found := mappings.FindScriptForNetwork(networkMaps, srv.IP); found {
 		logger.Debug("component", "polling", "msg", "Host found", "where", "network-mapping", "ip", srv.IP)
 		setHostName(script.Params, srv.Mac)
-		srv.Hostname = script.Params["hostname"].(string)
+		script.Params["hostname"] = srv.Hostname
 		eventLog.AddEvent(event.HostBoot, srv, event.SubnetMatchBoot, script.Name, script.Params)
 
 		return genBootScript(logger, templateRenderer, baseURL, script), found
