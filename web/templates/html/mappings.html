@@ -14,7 +14,7 @@
               {{ range .NetworkMaps }}
               <tr>
                 <td>{{ .Network }}</td>
-                <td>{{ .Script.String }}</td>
+                <td>{{ .Script }}</td>
               </tr>
               {{ end }}
             </table>
@@ -29,8 +29,8 @@
               </tr>
               {{ range .HostnameMaps }}
               <tr>
-                <td><code>/{{ .Hostname.String }}/</code></td>
-                <td>{{ .Script.String }}</td>
+                <td><code>/{{ .Hostname }}/</code></td>
+                <td>{{ .Script }}</td>
               </tr>
               {{ end }}
             </table>
