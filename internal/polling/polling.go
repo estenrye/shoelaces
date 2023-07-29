@@ -34,14 +34,28 @@ import (
 type ManualAction int
 
 const (
+	startScript = "#!ipxe\n" +
+		"echo Shoelaces starts polling\n" +
+		"chain --autofree --replace \\\n" +
+		"    http://{{.baseURL}}/poll/1/${netX/mac:hexhyp}\n" +
+		"#\n" +
+		"#\n" +
+		"# Do\n" +
+		"#    curl http://{{.baseURL}}/poll/1/06-66-de-ad-be-ef\n" +
+		"# to get an idea about what the iPXE client will receive.\n"
+
 	maxRetry = 10
 
 	retryScript = "#!ipxe\n" +
-		"prompt --key 0x02 --timeout 10000 shoelaces: Press Ctrl-B for manual override... && " +
-		"chain -ar http://{{.baseURL}}/ipxemenu || " +
-		"chain -ar http://{{.baseURL}}/poll/1/{{.macAddress}}\n"
+		"prompt --key 0x02 --timeout 7000 shoelaces: Press Ctrl-B for manual override... \\\n" +
+		"  && chain -ar http://{{.baseURL}}/ipxemenu \\\n" +
+		"  || chain -ar http://{{.baseURL}}/poll/1/{{.macAddress}}\n\n" +
+		"# Note: the iPXE client will see the above code as an endless loop.\n" +
+		"# However, Shoelaces server can break that loop to enable further booting.\n"
 
 	timeoutScript = "#!ipxe\n" +
+		"echo\n" +
+		"echo Shoelaces reached the maximum number of retries\n" +
 		"exit\n"
 
 	// BootAction is used when a user selects a script for the polling
@@ -224,6 +238,26 @@ func setHostName(params map[string]interface{}, mac string) {
 			params["hostname"] = hostname
 		}
 	}
+}
+
+func GenStartScript(logger log.Logger, baseURL string) string {
+	variablesMap := map[string]interface{}{}
+	parsedTemplate := &bytes.Buffer{}
+
+	tmpl, err := template.New("retry").Parse(startScript)
+	if err != nil {
+		logger.Info("component", "polling", "msg", "Error parsing start template")
+		panic(err)
+	}
+
+	variablesMap["baseURL"] = baseURL
+	err = tmpl.Execute(parsedTemplate, variablesMap)
+	if err != nil {
+		logger.Info("component", "polling", "msg", "Error executing start template")
+		panic(err)
+	}
+
+	return parsedTemplate.String()
 }
 
 func genBootScript(logger log.Logger, templateRenderer *templates.ShoelacesTemplates, baseURL string, script *mappings.Script) string {
