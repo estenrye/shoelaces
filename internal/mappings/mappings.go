@@ -15,6 +15,7 @@
 package mappings
 
 import (
+	"fmt"
 	"net"
 	"regexp"
 	"strings"
@@ -66,15 +67,16 @@ func FindScriptForNetwork(maps []NetworkMap, ip string) (script *Script, ok bool
 }
 
 func (s Script) String() string {
-	var result = s.Name + " : { "
+	var result = s.Name + " : {\n\t"
 	elems := []string{}
 	if s.Environment != "" {
 		elems = append(elems, "environment: "+s.Environment)
 	}
 	for key, value := range s.Params {
-		elems = append(elems, key+": "+value.(string))
+		output := fmt.Sprintf("%s: %v", key, value)
+		elems = append(elems, output)
 	}
-	result += strings.Join(elems, ", ") + " }"
+	result += strings.Join(elems, ",\n\t") + "\n}"
 
 	return result
 }

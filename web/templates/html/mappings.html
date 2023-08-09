@@ -19,6 +19,8 @@
               {{ end }}
             </table>
           </div>
+      {{ end }}
+      {{ if .HostnameMaps }}
           <div class="card card-default">
             <!-- Default card contents -->
             <div class="card-header">Hostname Mappings</div>
@@ -30,7 +32,7 @@
               {{ range .HostnameMaps }}
               <tr>
                 <td><code>/{{ .Hostname }}/</code></td>
-                <td>{{ .Script }}</td>
+                <td>{{ .Script.String }}</td>
               </tr>
               {{ end }}
             </table>
