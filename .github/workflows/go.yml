@@ -8,18 +8,13 @@ on:
 
 jobs:
 
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
+  go:
+    uses: estenrye/github_actions/.github/workflows/golang-build-and-test.yml@v0.1.0
 
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.18
-
-    - name: Build
-      run: go build -v ./...
-
-    - name: Test
-      run: go test -v ./...
+  docker:
+    uses: estenrye/github_actions.github/workflows/docker-multiarch-build-and-push.yml
+    with:
+      push: false
+      image_name: shoelaces
+      registry_username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+      registry_password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
