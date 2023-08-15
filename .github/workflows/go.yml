@@ -16,5 +16,6 @@ jobs:
     with:
       push: false
       image_name: shoelaces
+    secrets:
       registry_username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
       registry_password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
