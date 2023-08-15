@@ -9,10 +9,10 @@ on:
 jobs:
 
   go:
-    uses: estenrye/.github/.github/workflows/golang-build-and-test.yml@v0.1.4
+    uses: estenrye/.github/.github/workflows/golang-build-and-test.yml@v0.1.5
 
   docker:
-    uses: estenrye/.github/.github/workflows/docker-multiarch-build-and-push.yml@v0.1.4
+    uses: estenrye/.github/.github/workflows/docker-multiarch-build-and-push.yml@v0.1.5
     with:
       push: false
       image_name: shoelaces
