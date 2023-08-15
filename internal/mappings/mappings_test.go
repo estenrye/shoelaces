@@ -59,8 +59,8 @@ var (
 )
 
 func TestScript(t *testing.T) {
-	expected1 := "mock_script1 : { param11: param1_value1, param21: param2_value1 }"
-	expected2 := "mock_script1 : { param21: param2_value1, param11: param1_value1 }"
+	expected1 := "mock_script1 : {\n\tparam11: param1_value1,\n\tparam21: param2_value1\n}"
+	expected2 := "mock_script1 : {\n\tparam21: param2_value1,\n\tparam11: param1_value1\n}"
 	mockScriptString := mockScript1.String()
 	if mockScriptString != expected1 && mockScriptString != expected2 {
 		t.Errorf("Expected: %s or %s\nGot: %s\n", expected1, expected2, mockScriptString)
