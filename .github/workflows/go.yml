@@ -12,7 +12,7 @@ jobs:
     uses: estenrye/github-actions/.github/workflows/golang-build-and-test.yml@v0.1.0
 
   docker:
-    uses: estenrye/github-actions.github/workflows/docker-multiarch-build-and-push.yml@v0.1.0
+    uses: estenrye/github-actions/.github/workflows/docker-multiarch-build-and-push.yml@v0.1.0
     with:
       push: false
       image_name: shoelaces
