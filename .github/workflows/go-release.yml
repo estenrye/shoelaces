@@ -3,28 +3,40 @@ on:
   workflow_dispatch:
   release:
     types: [created]
-
 jobs:
-  goreleaser:
-    runs-on: ubuntu-latest
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      -
-        name: Set up Go
-        uses: actions/setup-go@v3
-      -
-        name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v3
-        with:
-          # either 'goreleaser' (default) or 'goreleaser-pro'
-          distribution: goreleaser
-          version: latest
-          args: release --rm-dist
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
-          # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+
+  go:
+    uses: estenrye/.github/.github/workflows/golang-slsa-releaser.yml@v0.1.6
+
+  docker:
+    uses: estenrye/.github/.github/workflows/docker-multiarch-build-and-push.yml@v0.1.6
+    with:
+      push: true
+      image_name: shoelaces
+    secrets:
+      registry_username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+      registry_password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+# jobs:
+#   goreleaser:
+#     runs-on: ubuntu-latest
+#     steps:
+#       -
+#         name: Checkout
+#         uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+#       -
+#         name: Set up Go
+#         uses: actions/setup-go@v3
+#       -
+#         name: Run GoReleaser
+#         uses: goreleaser/goreleaser-action@v3
+#         with:
+#           # either 'goreleaser' (default) or 'goreleaser-pro'
+#           distribution: goreleaser
+#           version: latest
+#           args: release --rm-dist
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
+#           # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
