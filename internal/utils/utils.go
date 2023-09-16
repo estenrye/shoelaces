@@ -15,10 +15,12 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/thousandeyes/shoelaces/internal/log"
 )
@@ -109,9 +111,20 @@ func BaseURLforEnvName(baseURL, environment string) string {
 
 // ResolveHostname receives an IP and returns the resolved PTR. It returns an
 // empty string in case the DNS lookup fails.
-func ResolveHostname(ip string) (host string) {
-	hosts, err := net.LookupAddr(ip)
+func ResolveHostname(logger log.Logger, ip string, dnsServer string) (host string) {
+	r := &net.Resolver{
+		PreferGo: true,
+		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
+			d := net.Dialer{
+				Timeout: time.Millisecond * time.Duration(10000),
+			}
+			return d.DialContext(ctx, network, dnsServer)
+		},
+	}
+
+	hosts, err := r.LookupAddr(context.Background(), ip)
 	if err != nil {
+		logger.Error("component", "utils", "function", "ResolveHostname", "msg", "Error resolving hostname", "ip", ip, "err", err)
 		return ""
 	}
 	return hosts[0]

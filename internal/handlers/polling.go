@@ -33,11 +33,10 @@ import (
 func StartPollingHandler(w http.ResponseWriter, r *http.Request) {
 	env := envFromRequest(r)
 
-	script := polling.GenStartScript(env.Logger,  env.BaseURL)
+	script := polling.GenStartScript(env.Logger, env.BaseURL)
 
 	w.Write([]byte(script))
 }
-
 
 // PollHandler is called by iPXE boot agents. It returns the boot script
 // specified on the configuration or, if the host is unknown, it makes it
@@ -69,7 +68,7 @@ func PollHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if host == "" {
-		host = resolveHostname(env.Logger, ip)
+		host = resolveHostname(env.Logger, ip, env.DnsAddr)
 	}
 
 	server := server.New(mac, ip, host)
@@ -177,8 +176,9 @@ func validateMACAndIP(logger log.Logger, mac string, ip string) (err error) {
 	return nil
 }
 
-func resolveHostname(logger log.Logger, ip string) string {
-	host := utils.ResolveHostname(ip)
+func resolveHostname(logger log.Logger, ip string, dnsServer string) string {
+	host := utils.ResolveHostname(logger, ip, dnsServer)
+
 	if host == "" {
 		logger.Info("component", "polling", "msg", "Can't resolve IP", "ip", ip)
 	}

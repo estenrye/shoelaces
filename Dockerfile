@@ -6,16 +6,8 @@ COPY go.mod go.sum main.go /app/
 WORKDIR /app
 ARG TARGETOS
 ARG TARGETARCH
-RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} GODEBUG=netdns=go \
     go build -a -ldflags='-s -w -extldflags "-static"' -o /tmp/shoelaces ./main.go
-
-# FROM golang:1.15-alpine AS build
-
-# WORKDIR /shoelaces
-# COPY . .
-
-# RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-s -w -extldflags "-static"' -o /tmp/shoelaces . && \
-# printf "---\nnetworkMaps:\n" > /tmp/mappings.yaml
 
 # Final container has basically nothing in it but the executable
 FROM scratch
