@@ -132,7 +132,7 @@ func varMapFromRequest(r *http.Request) map[string]interface{} {
 
 	host := r.FormValue("host")
 	if host == "" {
-		host = resolveHostname(env.Logger, ip)
+		host = resolveHostname(env.Logger, ip, env.DnsAddr)
 	}
 
 	variablesMap["hostname"] = host
