@@ -118,6 +118,7 @@ func ResolveHostname(logger log.Logger, ip string, dnsServer string) (host strin
 			d := net.Dialer{
 				Timeout: time.Millisecond * time.Duration(10000),
 			}
+			logger.Debug("component", "utils", "function", "ResolveHostname", "msg", "Resolving hostname", "ip", ip, "dnsServer", dnsServer, "network", network, "address", address)
 			return d.DialContext(ctx, network, dnsServer)
 		},
 	}
@@ -127,6 +128,7 @@ func ResolveHostname(logger log.Logger, ip string, dnsServer string) (host strin
 		logger.Error("component", "utils", "function", "ResolveHostname", "msg", "Error resolving hostname", "ip", ip, "err", err)
 		return ""
 	}
+	logger.Debug("component", "utils", "function", "ResolveHostname", "msg", "Hostname resolved", "ip", ip, "host", hosts[0])
 	return hosts[0]
 }
 
