@@ -30,7 +30,7 @@ func (env *Environment) setFlags() {
 	flag.StringVar(&env.EnvDir, "env-dir", "env_overrides", "Directory with overrides")
 	flag.StringVar(&env.TemplateExtension, "template-extension", ".slc", "Shoelaces template extension")
 	flag.StringVar(&env.MappingsFile, "mappings-file", "mappings.yaml", "My mappings YAML file")
-	flag.StringVar(&env.DnsAddr, "dns-addr", "1.1.1.1:53", "DNS server address")
+	flag.StringVar(&env.DnsAddr, "dns-addr", "127.0.0.1:53", "DNS server address")
 	flag.BoolVar(&env.Debug, "debug", false, "Debug mode")
 
 	flag.Parse()

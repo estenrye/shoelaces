@@ -15,13 +15,12 @@
 package utils
 
 import (
-	"context"
 	"fmt"
 	"net"
 	"path/filepath"
 	"strings"
-	"time"
 
+	"github.com/miekg/dns"
 	"github.com/thousandeyes/shoelaces/internal/log"
 )
 
@@ -112,24 +111,25 @@ func BaseURLforEnvName(baseURL, environment string) string {
 // ResolveHostname receives an IP and returns the resolved PTR. It returns an
 // empty string in case the DNS lookup fails.
 func ResolveHostname(logger log.Logger, ip string, dnsServer string) (host string) {
-	r := &net.Resolver{
-		PreferGo: true,
-		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
-			d := net.Dialer{
-				Timeout: time.Millisecond * time.Duration(10000),
-			}
-			logger.Debug("component", "utils", "function", "ResolveHostname", "msg", "Resolving hostname", "ip", ip, "dnsServer", dnsServer, "network", network, "address", address)
-			return d.DialContext(ctx, network, dnsServer)
-		},
+	addr, err := dns.ReverseAddr(ip)
+	if err != nil {
+		logger.Error("component", "utils", "function", "ResolveHostname", "msg", "Error resolving hostname", "ip", ip, "err", err, "addr", addr)
+		return ""
 	}
 
-	hosts, err := r.LookupAddr(context.Background(), ip)
+	logger.Debug("component", "utils", "function", "ResolveHostname", "msg", "Querying DNS server for PTR record", "ip", ip, "addr", addr, "dnsServer", dnsServer)
+	m := new(dns.Msg)
+	m.SetQuestion(addr, dns.TypePTR)
+	m.RecursionDesired = true
+
+	c := new(dns.Client)
+	in, rtt, err := c.Exchange(m, dnsServer)
 	if err != nil {
 		logger.Error("component", "utils", "function", "ResolveHostname", "msg", "Error resolving hostname", "ip", ip, "err", err)
 		return ""
 	}
-	logger.Debug("component", "utils", "function", "ResolveHostname", "msg", "Hostname resolved", "ip", ip, "host", hosts[0])
-	return hosts[0]
+	logger.Debug("component", "utils", "function", "ResolveHostname", "msg", "Hostname resolved", "ip", ip, "host", in.Answer[0].(*dns.PTR).Ptr, "rtt", rtt)
+	return in.Answer[0].(*dns.PTR).Ptr
 }
 
 // IsValidIP returns whether or not an IP is well-formed.
