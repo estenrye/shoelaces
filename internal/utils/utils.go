@@ -124,7 +124,7 @@ func ResolveHostname(logger log.Logger, ip string, dnsServer string) (host strin
 
 	c := new(dns.Client)
 	in, rtt, err := c.Exchange(m, dnsServer)
-	if err != nil {
+	if err != nil || len(in.Answer) == 0 {
 		logger.Error("component", "utils", "function", "ResolveHostname", "msg", "Error resolving hostname", "ip", ip, "err", err)
 		return ""
 	}
